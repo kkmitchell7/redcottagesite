@@ -1,0 +1,6 @@
+<ul>
+    {% for item in bookings %}
+      <li> {{ item.name }} {{ item.start_date }} </li>
+    {% endfor %}
+
+    </ul>
