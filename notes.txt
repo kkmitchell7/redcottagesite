@@ -1,0 +1,24 @@
+to start virutal environment:
+make sure in parent directory (red cottage)
+. venv/bin/activate
+
+to run the server:
+cd redcottage
+python3 manage.py runserver
+
+to do:
+
+bugs:
+-
+
+features: (I want to first focus on being able to actually book the site)
+
+- after transaction has gone through, need to update the database so that the calendar is booked on those days
+- need to ensure you cant book already booked days - add redudancy in the database so it cant happen
+- test to make sure you cant click on booked days
+- need to think about edge cases with the database - what happens if someone accidentally books & wants refund, how does stripe handle that?
+
+- once this functionality is implemented, ask mom about pricing & what else she wants on the site (photos, ect)
+- make it prettier & more user friendly
+
+-update to newer version of stripe?
