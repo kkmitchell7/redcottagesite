@@ -7,18 +7,21 @@ cd redcottage
 python3 manage.py runserver
 
 to do:
+- add logins to original app
 
 bugs:
 -
 
 features: (I want to first focus on being able to actually book the site)
-
-- after transaction has gone through, need to update the database so that the calendar is booked on those days
+- add a login feature
+- after transaction has gone through, need to update the database so that the calendar is booked on those days: https://www.youtube.com/watch?v=8WQap8VFLA4&ab_channel=Pabbly
+- make sure the passing varible works from calculate price into the stripe amount
+- need to do some testing with paying
 - need to ensure you cant book already booked days - add redudancy in the database so it cant happen
-- test to make sure you cant click on booked days
 - need to think about edge cases with the database - what happens if someone accidentally books & wants refund, how does stripe handle that?
 
 - once this functionality is implemented, ask mom about pricing & what else she wants on the site (photos, ect)
 - make it prettier & more user friendly
 
 -update to newer version of stripe?
+- need to create a new account with stripe - mom's own account and don't leak API keys!!

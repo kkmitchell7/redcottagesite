@@ -146,9 +146,23 @@ document.getElementById('day').addEventListener('click', function(event) {
     
 
     if (startDate != null && endDate != null){
-        var priceCalc = calculatePrice(startDate,endDate);
-        displayPrice.textContent = ' Price:' + priceCalc;
-        document.getElementById("paymentGateway").setAttribute("data-amount", priceCalc); //not sure if this is working
+        var daysCalc = calculateDays(startDate,endDate);
+        displayPrice.textContent = ' Price:' + Math.ceil(daysCalc * 200);
+
+        //send the info to views so stripe can use this quanity info
+        var csrftoken = getCookie('csrftoken');
+        
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", window.location.href, true); //"{% url 'Book Now' %}" issue is here!!
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        /*xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Redirect to checkout session URL
+                window.location.href = JSON.parse(xhr.responseText).url;
+            }
+        };*/
+        xhr.send("request_type=return_days&num_days=" + encodeURIComponent(daysCalc));
     }
     
 
@@ -171,13 +185,13 @@ document.getElementById('day').addEventListener('click', function(event) {
 });
 
 
-function calculatePrice(sDate,eDate) { //Takes in Date objects
+function calculateDays(sDate,eDate) { //Takes in Date objects
 
     // Calculate the difference in days
     const timeDifference = eDate.getTime() - sDate.getTime();
     const daysDifference = (timeDifference / (1000 * 60 * 60 * 24));
 
-    return Math.ceil(daysDifference * 200) //Return price
+    return daysDifference //Return days
 }
 
 function is_date1_before_date2(strd1,strd2) { //Takes in string of date
@@ -193,4 +207,20 @@ function is_date1_before_date2(strd1,strd2) { //Takes in string of date
     } else if (daysDifference <= 0){
         return false;
     }
+}
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }

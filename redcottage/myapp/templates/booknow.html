@@ -14,7 +14,6 @@
 
   
   <body>
-    
     <div class="container1">
       <div class="wrapper">
         <header>
@@ -39,20 +38,24 @@
       </div>
       <div class = "wrappersmall">
         <h3> Book Now </h3>
-        <form action="{% url 'Booking Complete' %}" method="post">
-          {% csrf_token %}
-          <script id="paymentGateway" src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-            data-key="{{ key }}"
-            data-description="Payment Gateway"
-            data-amount="0"
-            data-locale="auto"></script>
-        </form>
-        <div id="displayStartDate" style="display: none;"></div>
-        <div id="displayEndDate" style="display: none;"></div>
-        <div id="displayPrice" style="display: none;"></div>
+        <div class="container">
+          {% if user.is_authenticated %}
+            <form enctype="multipart/form-data" method="post" role="product_page">
+              {% csrf_token %}
+              <input type="hidden" name="request_type" value="booking">
+              <p> Hi {{ user }}! To book now, click here <button type="submit" class="btn btn-success" href="{% url 'Book Now' %}" data-bind-href="pricing">Payment</button></p>
+            </form>
+          {% else %}
+            <p> You're not logged in...</p><a href="{% url 'login' %}" class = "btn btn-secondary"> Log in</a>
+          {% endif %}
+        </div>
       </div>
         
     </div>
+    
+    <div id="displayStartDate" style="display: none;">{% csrf_token %}</div>
+    <div id="displayEndDate" style="display: none;">{% csrf_token %}</div>
+    <div id="displayPrice" style="display: none;">{% csrf_token %}</div>
 
 
     
