@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import mimetypes
+from redcottage.secret_keys import *
 mimetypes.add_type("text/css", ".css", True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -138,7 +139,6 @@ STATIC_ROOT = BASE_DIR / "assets"
 
 STRIPE_PUBLISHABLE_KEY = 'pk_test_51OxblLHXdx6cDJJLGuByYwy3sLXxaiYxLY1mKwoqFYXbG1kHjsMqM8l85ZWRwJfR4BWsxvj6GTadZ1QItlerIMAN00BQEoQJMN'
 
-STRIPE_SECRET_KEY = 'sk_test_51OxblLHXdx6cDJJLDEOpscCt2MWSy5fhDJoZ6KjIfqc4BVeLOuqYj9Wmg0vakAYm4ycd98YZI0K4WjNqWIEu4aJl00SVHufh4r'
 
 REDIRECT_DOMAIN = 'http://localhost:8000' #this needs to change once its up and running
 
