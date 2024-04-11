@@ -16,10 +16,11 @@ import time
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
-# Create your views here.
+
 def home(request):
     return render(request, "home.html")
 
+#handle javascript post to /booknow/add page
 def post_add(request):
     num_days = None
     start_date = None
@@ -56,6 +57,7 @@ class booknow(TemplateView):
 
         return context
 
+    #handle post requests for stripe
     def post(self, request, *args, **kwargs):
         num_days = None
         start_date = None
@@ -150,9 +152,6 @@ def stripe_webhook(request):
 
         user_payment.save()
     return HttpResponse(status=200)
-
-def login(request):
-    return render(request, "login.html")
 
 
 
