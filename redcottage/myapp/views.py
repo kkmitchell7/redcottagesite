@@ -20,6 +20,24 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 def home(request):
     return render(request, "home.html")
 
+def post_add(request):
+    num_days = None
+    start_date = None
+    end_date = None
+    request_type = request.POST.get('request_type')
+
+    if request_type == 'return_days': #something wrong here
+        num_days = int(request.POST.get('num_days', 1))
+        start_date = request.POST.get('start_date',1)
+        end_date = request.POST.get('end_date',1)
+    
+    request.session['num_days'] = num_days
+    request.session['start_date'] = start_date
+    request.session['end_date'] = end_date
+    
+
+    return JsonResponse({'message': 'Return days processed successfully'})
+
 #@method_decorator(login_required, name='dispatch')
 #add back once implemented accounts but only to accounts page!
 class booknow(TemplateView):
@@ -39,47 +57,46 @@ class booknow(TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        num_days = 0
-
+        num_days = None
+        start_date = None
+        end_date = None
         request_type = request.POST.get('request_type')
 
-        if request_type == 'return_days':
-            num_days = int(request.POST.get('num_days', 1))
-
-            return JsonResponse({'message': 'Return days processed successfully'})
-        
+        num_days = request.session.get('num_days')
+        start_date = request.session.get('start_date')
+        end_date = request.session.get('end_date')
         
         if request_type == 'booking':
-            checkout_session = stripe.checkout.Session.create(
-                payment_method_types = ['card'],
-                line_items = [
-                    {
-                        'price' : settings.PRODUCT_PRICE,
-                        'quantity': num_days, #need to pass in quantity here from booknow.html
-                    }
-                ],
-                mode = 'payment',
-                customer_creation = 'always',
-                success_url = settings.REDIRECT_DOMAIN + '/bookingcomplete/?session_id={CHECKOUT_SESSION_ID}', 
-                cancel_url = settings.REDIRECT_DOMAIN+ '/bookingfailed/' 
+            if num_days:
+                checkout_session = stripe.checkout.Session.create(
+                    payment_method_types = ['card'],
+                    line_items = [
+                        {
+                            'price' : settings.PRODUCT_PRICE,
+                            'quantity': int(num_days), #need to pass in quantity here from booknow.html
+                        }
+                    ],
+                    metadata={
+                        'start_date': start_date,
+                        'end_date': end_date
+                    },
+                    mode = 'payment',
+                    customer_creation = 'always',
+                    success_url = settings.REDIRECT_DOMAIN + '/bookingcomplete/?session_id={CHECKOUT_SESSION_ID}', 
+                    cancel_url = settings.REDIRECT_DOMAIN+ '/bookingfailed/' 
 
-            )
+                )
 
-            # Redirect or render a response after handling POST
-            return redirect(checkout_session.url, code=303)
+                # Redirect or render a response after handling POST
+                return redirect(checkout_session.url, code=303)
+            else:
+                return JsonResponse({'message': 'Checkout not processed. No days selected.'})
+
 
 def learnmore(request):
     return render(request, "learnmore.html")
 
 def bookingcomplete(request):
-    #need to find a way to pass a value here from the booknow page javascript file!
-    #if request.method == 'POST':
-    #    bookingcomplete = stripe.Charge.create(
-    #        amount = 500,
-    #        currency = 'usd',
-    #        description='Red Cottage Booking',
-    #        source=request.POST['stripeToken']
-    #    )
     stripe.api_key = settings.STRIPE_SECRET_KEY
     checkout_session_id = request.GET.get('session_id', None)
     session = stripe.checkout.Session.retrieve(checkout_session_id)
@@ -114,9 +131,23 @@ def stripe_webhook(request):
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         session_id = session.get('id', None)
+        
+        metadata = session.get('metadata', {})
+        start_date = metadata['start_date']
+        end_date = metadata['end_date']
+        
+        line_items = session.get('line_items',[])
+        length = line_items[0]['quantity']
+        price = line_items[0]['price']
+        
         time.sleep(15)
         user_payment = Booking.objects.get(stripe_checkout_id=session_id)
         user_payment.payment_bool = True
+        user_payment.start_date = start_date
+        user_payment.end_date = end_date
+        user_payment.length = length
+        user_payment.price_paid = price
+
         user_payment.save()
     return HttpResponse(status=200)
 

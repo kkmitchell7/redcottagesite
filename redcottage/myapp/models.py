@@ -13,6 +13,7 @@ class Booking(models.Model):
     end_date = models.DateField(default=django.utils.timezone.now)
     length = models.IntegerField() #number of nights staying
     payment_bool = models.BooleanField(default=False)
+    price_paid = models.FloatField(default=0)
     stripe_checkout_id = models.CharField(max_length=500)
 
     def get_all_dates(self):

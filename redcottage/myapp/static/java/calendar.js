@@ -153,16 +153,21 @@ document.getElementById('day').addEventListener('click', function(event) {
         var csrftoken = getCookie('csrftoken');
         
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", window.location.href, true); //"{% url 'Book Now' %}" issue is here!!
+        xhr.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              var l = None;
+            }
+          };
+        xhr.open("POST", 'add', true); //"{% url 'Book Now' %}" issue is here!!
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        /*xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                // Redirect to checkout session URL
-                window.location.href = JSON.parse(xhr.responseText).url;
-            }
-        };*/
-        xhr.send("request_type=return_days&num_days=" + encodeURIComponent(daysCalc));
+
+        var postData = "request_type=return_days"+ 
+               "&num_days=" + encodeURIComponent(daysCalc) + 
+               "&start_date=" + encodeURIComponent(startDate)+
+                "&end_date=" + encodeURIComponent(endDate);
+
+        xhr.send(postData); //need to send start & end dates here!!
     }
     
 
